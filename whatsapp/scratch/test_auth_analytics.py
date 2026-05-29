@@ -56,7 +56,6 @@ def run_verification():
         "role": "Staff"
     }
     
-    # Try to clean up existing user from previous runs if any
     status, users = make_request(f"{BASE_URL}/api/users", token=admin_token)
     for u in users:
         if u["username"] == "siddharth_test":
