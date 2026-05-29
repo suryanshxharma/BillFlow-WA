@@ -1,4 +1,4 @@
-# ⚡ BillFlow WA: Modern WhatsApp Billing & Digital Receipt SaaS
+# BillFlow WA: Modern WhatsApp Billing & Digital Receipt SaaS
 
 BillFlow WA is an ultra-premium, modern, and highly responsive Billing and WhatsApp Automation platform designed specifically for retail shops, restaurants, service agencies, and small-to-medium businesses. 
 
@@ -6,7 +6,7 @@ It is designed to be lightweight, incredibly fast, and 100% ready for white-labe
 
 ---
 
-## 🌟 Premium Features
+##  Premium Features
 
 1. **Store Configuration & White-labeling**:
    - Customize store name, manager details, currency symbols, and address.
@@ -28,7 +28,7 @@ It is designed to be lightweight, incredibly fast, and 100% ready for white-labe
    - Merges customer names, invoice IDs, and total values instantly.
    - Operates 100% free of Meta API charges, completely eliminating risk of number blocks or Meta developer account requirements.
 
-5. **📢 Mass Broadcast Campaigns (NEW)**:
+5. **Mass Broadcast Campaigns **:
    - **Dynamic Message Composer**: Write promotional text alerts or custom discounts using dynamic placeholders like `{customer_name}` and `{business_name}`.
    - **Direct Redirection Queue Runner (Free & Safe)**: Broadcasts offers manually to your entire customer list without incurring API costs. A beautiful progressive runner lets you click "Dispatch" in sequence for each customer, auto-advancing as you progress.
    - **Campaign Persistent History Ledger**: Complete tracking of sent campaigns, target audience pools, progress indicators, and statuses.
@@ -38,12 +38,12 @@ It is designed to be lightweight, incredibly fast, and 100% ready for white-labe
    - Adjust payment status flags (Paid, Unpaid, Cancelled) dynamically.
    - Filter, print, download PDF, or resend notifications instantly.
 
-7. **🛍️ Mini-Inventory Catalog Manager (NEW)**:
+7. **Mini-Inventory Catalog Manager **:
    - Create a persistent database of store products containing SKUs, names, standard unit rates, tax percentages, and stock levels.
    - **POS Item Autocomplete**: As you type item names in the POS creator, matching products from the catalog are suggested. Clicking a suggestion auto-fills rates, default taxes, and live stock levels.
    - **Transactional Stock Auto-Deduction**: Submitting an invoice automatically decrements the respective product's stock levels in the database transaction, warning you when stock falls below 5 ("Low Stock") or reaches 0 ("Out of Stock").
 
-8. **🛎️ UPI Confirmation Polling & Cash Chimes (NEW)**:
+8. **UPI Confirmation Polling & Cash Chimes **:
    - **Interactive Receipt Checkouts**: Dynamic hosted digital receipts (`/receipt/{hash}`) feature a prominent glowing "Mark as Paid / Confirm UPI Payment" button.
    - **Background UPI Polling**: The merchant dashboard polls the database state in the background. If a customer confirms their payment on their receipt, the dashboard instantly detects the status change.
    - **Web Audio Cash Register Double-Chime**: Instantly synthesizes a beautiful, offline-capable "Cha-Ching" double-chime tone natively using the browser's built-in **Web Audio API** (zero heavy external audio asset files or network lag!).
@@ -51,7 +51,7 @@ It is designed to be lightweight, incredibly fast, and 100% ready for white-labe
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Backend**: FastAPI (Python 3.13) + SQLAlchemy (SQLite Database). Asynchronous, high-performance, and lightweight.
 - **Frontend SPA**: HTML5, custom HSL Vanilla CSS3 variable theme, and modular ES6 Vanilla JavaScript (using async fetching). Highly reactive, no heavy node build pipelines required.
@@ -60,7 +60,7 @@ It is designed to be lightweight, incredibly fast, and 100% ready for white-labe
 
 ---
 
-## 🚀 Easy Setup & Execution
+## Easy Setup & Execution
 
 ### Prerequisites
 Make sure Python 3.13+ is installed on your computer.
@@ -82,21 +82,3 @@ python3 -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 - **Interactive API Documentation (Swagger)**: Open `http://localhost:8000/docs` to inspect backend endpoints.
 
 ---
-
-## 💰 Reselling Opportunities
-
-You can package and monetize BillFlow WA in several lucrative ways:
-
-1. **Local Self-Hosted POS Installation (One-Time Sale)**:
-   - Package the backend and public assets together and install it on store computer systems.
-   - Run the server in the background and place a shortcut icon on their desktop linking to `http://localhost:8000`.
-   - Charge a premium one-time setup fee + yearly maintenance/support contracts (e.g. ₹5,000 - ₹15,000 / shop).
-
-2. **Centralized Cloud SaaS (Monthly Subscription)**:
-   - Deploy the FastAPI backend on a single Linux cloud virtual private server (e.g., DigitalOcean, AWS, Heroku) connected to a PostgreSQL database instance.
-   - Scale the database tables to support multi-tenant user authentication (multi-business login).
-   - Charge merchants a monthly recurring fee (SaaS) to access their account (e.g. ₹500 - ₹1,500 / month).
-
-3. **Custom Restaurant / Service Industry POS**:
-   - Customize the template views to support kitchen ordering tickets (KOT) or service scheduling.
-   - White-label the logo, font selection, and color palettes to match premium high-end brands.
