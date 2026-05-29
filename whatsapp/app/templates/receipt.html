@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice {{ invoice.invoice_number }} - {{ business.name }}</title>
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            --font-main: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-mono);
+            background: var(--bg-dark);
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2.5rem 1rem;
+            line-height: 1.4;
+        }
+
+        /* Pristine Thermal POS Receipt Container */
+        .receipt-card {
+            background: #ffffff;
+            color: #1e293b;
+            border-radius: 12px 12px 0 0;
+            width: 100%;
+            max-width: 420px;
+            padding: 2.5rem 1.75rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                        0 0 40px rgba(99, 102, 241, 0.1);
+            position: relative;
+            border: 1px solid #e2e8f0;
+            page-break-inside: avoid;
+        }
+
+        /* Classic Serrated Zigzag Bottom Tear-Off Edge */
+        .receipt-card::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -8px;
+            height: 8px;
+            background-image: 
+                linear-gradient(135deg, #ffffff 25%, transparent 25%), 
+                linear-gradient(225deg, #ffffff 25%, transparent 25%);
+            background-size: 8px 16px;
+            background-position: left bottom;
+            background-repeat: repeat-x;
+            z-index: 10;
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+
+        .logo-container {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: #0f172a;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            font-weight: 700;
+            font-size: 1.4rem;
+            overflow: hidden;
+            border: 1px solid #1e293b;
+        }
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-fallback {
+            font-weight: 800;
+            font-family: var(--font-main);
+            color: #ffffff;
+        }
+
+        .business-name {
+            font-family: var(--font-main);
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.15rem;
+            color: #0f172a;
+        }
+
+        .business-address {
+            font-size: 0.75rem;
+            color: #64748b;
+            max-width: 320px;
+            margin: 0 auto;
+        }
+
+        /* Authentic Ink Press Stamps */
+        .stamp-container {
+            margin: 0.75rem auto 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .paid-stamp {
+            border: 3px double #10b981;
+            color: #10b981;
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 0.2rem 0.75rem;
+            border-radius: 6px;
+            display: inline-block;
+            transform: rotate(-8deg);
+            letter-spacing: 0.1em;
+            background: #ffffff;
+            box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #10b981;
+            font-family: var(--font-main);
+        }
+
+        .cancelled-stamp {
+            border: 3px double #ef4444;
+            color: #ef4444;
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 0.2rem 0.75rem;
+            border-radius: 6px;
+            display: inline-block;
+            transform: rotate(-8deg);
+            letter-spacing: 0.1em;
+            background: #ffffff;
+            box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #ef4444;
+            font-family: var(--font-main);
+        }
+
+        .r-badge-pending {
+            display: inline-block;
+            background: #fef3c7;
+            color: #d97706;
+            font-size: 0.65rem;
+            padding: 0.15rem 0.6rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: var(--font-main);
+            border: 1px solid #fde68a;
+        }
+
+        /* Monospace Dashed Dividers */
+        .r-divider {
+            border-top: 1.5px dashed #cbd5e1;
+            margin: 1rem 0;
+            height: 0;
+        }
+
+        /* Info Grid */
+        .info-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            font-size: 0.8rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            color: #475569;
+        }
+
+        .info-row span:last-child {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        /* Items Grid Table */
+        .r-items-table {
+            margin: 1.25rem 0;
+        }
+
+        .r-items-header {
+            display: grid;
+            grid-template-columns: 2.2fr 0.8fr 1.2fr;
+            font-weight: 700;
+            color: #0f172a;
+            border-bottom: 1.5px dashed #64748b;
+            padding-bottom: 0.35rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .r-item-row {
+            display: grid;
+            grid-template-columns: 2.2fr 0.8fr 1.2fr;
+            color: #1e293b;
+            font-size: 0.8rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #f1f5f9;
+            align-items: start;
+        }
+
+        .r-item-row:last-child {
+            border-bottom: none;
+        }
+
+        .r-item-details {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .r-item-name {
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .r-item-meta {
+            font-size: 0.65rem;
+            color: #64748b;
+            margin-top: 0.1rem;
+        }
+
+        .r-item-qty {
+            text-align: center;
+            color: #475569;
+        }
+
+        .r-item-price {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        /* Financial Summary */
+        .r-totals {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            font-size: 0.8rem;
+        }
+
+        .r-total-row {
+            display: flex;
+            justify-content: space-between;
+            color: #475569;
+        }
+
+        .r-total-row.grand-total {
+            border-top: 1.5px dashed #0f172a;
+            padding-top: 0.5rem;
+            margin-top: 0.25rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        /* UPI Payment Block */
+        .payment-block {
+            text-align: center;
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin: 1.25rem 0;
+            page-break-inside: avoid;
+        }
+
+        .qr-code-img {
+            background: white;
+            padding: 8px;
+            border-radius: 8px;
+            width: 140px;
+            height: 140px;
+            margin: 0.4rem auto 0.75rem;
+            display: block;
+            border: 1px solid #e2e8f0;
+        }
+
+        .payment-help {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-bottom: 0.6rem;
+        }
+
+        .pay-btn {
+            background: #4f46e5;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+            transition: all 0.2s ease;
+            width: 100%;
+            justify-content: center;
+            font-family: var(--font-main);
+        }
+
+        .pay-btn:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 0.65rem;
+            color: #64748b;
+            margin-top: 1.25rem;
+        }
+
+        /* Floating Screen Action Bar */
+        .floating-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+            z-index: 20;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            font-family: var(--font-main);
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        /* Print Media Overrides */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #1e293b !important;
+                padding: 0 !important;
+                display: block !important;
+            }
+            .receipt-card {
+                box-shadow: none !important;
+                border: 1px solid #cbd5e1 !important;
+                background: #ffffff !important;
+                color: #1e293b !important;
+                max-width: 420px !important;
+                margin: 0 auto !important;
+                padding: 1.5rem 1rem !important;
+                page-break-inside: avoid !important;
+            }
+            .receipt-card::after {
+                display: block !important;
+                content: '' !important;
+                position: absolute !important;
+                background-image: 
+                    linear-gradient(135deg, #ffffff 25%, transparent 25%), 
+                    linear-gradient(225deg, #ffffff 25%, transparent 25%) !important;
+                background-size: 8px 16px !important;
+                filter: none !important;
+            }
+            .floating-actions,
+            .pay-btn {
+                display: none !important;
+            }
+            .payment-block {
+                background: #ffffff !important;
+                border: 1px dashed #64748b !important;
+                page-break-inside: avoid !important;
+            }
+            .qr-code-img {
+                box-shadow: none !important;
+                border: 1px solid #cbd5e1 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="receipt-card">
+        <!-- Receipt Header -->
+        <div class="header">
+            <div class="logo-container">
+                {% if business.logo_url %}
+                    <img src="{{ business.logo_url }}" alt="{{ business.name }}" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <div class="logo-fallback" style="display:none">{{ business.name[0] | upper }}</div>
+                {% else %}
+                    <div class="logo-fallback">{{ business.name[0] | upper }}</div>
+                {% endif %}
+            </div>
+            <h1 class="business-name">{{ business.name }}</h1>
+            <p class="business-address">{{ business.address }}</p>
+            
+            <!-- Authentic Stamps / Badges -->
+            <div class="stamp-container">
+                {% if invoice.payment_status == 'Paid' %}
+                    <div class="paid-stamp">Paid</div>
+                {% elif invoice.payment_status == 'Cancelled' %}
+                    <div class="cancelled-stamp">Cancelled</div>
+                {% else %}
+                    <div class="r-badge-pending">Pending</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="r-divider"></div>
+
+        <!-- Info Grid -->
+        <div class="info-rows">
+            <div class="info-row">
+                <span>Bill No:</span>
+                <span>{{ invoice.invoice_number }}</span>
+            </div>
+            <div class="info-row">
+                <span>Date:</span>
+                <span>{{ invoice.date.strftime('%d %b %Y') }}</span>
+            </div>
+            <div class="info-row">
+                <span>Client:</span>
+                <span>{{ customer.name }}</span>
+            </div>
+            <div class="info-row">
+                <span>Contact:</span>
+                <span>{{ customer.phone }}</span>
+            </div>
+        </div>
+
+        <div class="r-divider"></div>
+
+        <!-- Items Table -->
+        <div class="r-items-table">
+            <div class="r-items-header">
+                <div>Item</div>
+                <div style="text-align: center;">Qty</div>
+                <div style="text-align: right;">Total</div>
+            </div>
+            <div class="r-items-body">
+                {% for item in items %}
+                    <div class="r-item-row">
+                        <div class="r-item-details">
+                            <div class="r-item-name">{{ item.name }}</div>
+                            <div class="r-item-meta">
+                                {{ business.currency }}{{ "%.2f"|format(item.rate) }}
+                                {% if item.discount_rate > 0 %}
+                                    (-{{ "%.0f"|format(item.discount_rate) }}% off)
+                                {% endif %}
+                                {% if item.tax_rate > 0 %}
+                                    (+{{ "%.0f"|format(item.tax_rate) }}% tax)
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="r-item-qty">{{ "%.0f"|format(item.quantity) }}</div>
+                        <div class="r-item-price">{{ business.currency }}{{ "%.2f"|format(item.total) }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="r-divider"></div>
+
+        <!-- Financial Summary -->
+        <div class="r-totals">
+            <div class="r-total-row">
+                <span>Subtotal:</span>
+                <span>{{ business.currency }}{{ "%.2f"|format(invoice.subtotal) }}</span>
+            </div>
+            {% if invoice.discount_total > 0 %}
+                <div class="r-total-row" style="color: #ef4444;">
+                    <span>Discount:</span>
+                    <span>-{{ business.currency }}{{ "%.2f"|format(invoice.discount_total) }}</span>
+                </div>
+            {% endif %}
+            {% if invoice.tax_total > 0 %}
+                <div class="r-total-row">
+                    <span>Tax:</span>
+                    <span>+{{ business.currency }}{{ "%.2f"|format(invoice.tax_total) }}</span>
+                </div>
+            {% endif %}
+            <div class="r-total-row grand-total">
+                <span>Grand Total:</span>
+                <span>{{ business.currency }}{{ "%.2f"|format(invoice.grand_total) }}</span>
+            </div>
+        </div>
+
+        <div class="r-divider"></div>
+
+        <!-- UPI Payments Box -->
+        {% if upi_payment_url and invoice.payment_status != 'Paid' and invoice.payment_status != 'Cancelled' %}
+            <div class="payment-block">
+                <p class="payment-help">Scan QR Code with any UPI App to Pay:</p>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ upi_payment_url | urlencode }}&color=0f172a" alt="Scan to Pay" class="qr-code-img">
+                
+                <a href="{{ upi_payment_url }}" class="pay-btn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-smartphone"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+                    Pay via UPI App
+                </a>
+            </div>
+            <div class="r-divider"></div>
+        {% endif %}
+
+        <!-- Receipt Footer -->
+        <div class="r-footer">
+            <p>Thank you for your business!</p>
+            <p style="font-size: 0.55rem; opacity: 0.6; margin-top: 0.25rem;">Powering Digital Invoicing by BillFlow WA</p>
+        </div>
+    </div>
+
+    <!-- Floating Action Buttons -->
+    <div class="floating-actions">
+        <button onclick="window.print()" class="action-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v5"/><rect width="12" height="8" x="6" y="14" rx="1" ry="1"/></svg>
+            Print Receipt
+        </button>
+        <button onclick="window.print()" class="action-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+            Save PDF
+        </button>
+    </div>
+
+</body>
+</html>

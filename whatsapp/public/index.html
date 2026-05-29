@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BillFlow WA - Premium WhatsApp Billing Dashboard</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- CSS link -->
+    <link rel="stylesheet" href="/styles.css?v=1.0.4">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">⚡</div>
+                <div class="logo-text">BillFlow<span>WA</span></div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-tab="dashboard-tab">
+                    <span class="icon">📊</span> Dashboard
+                </button>
+                <button class="nav-item" data-tab="create-bill-tab">
+                    <span class="icon">📝</span> Create Invoice
+                </button>
+                <button class="nav-item" data-tab="invoices-tab">
+                    <span class="icon">📁</span> Invoices
+                </button>
+                <button class="nav-item" data-tab="customers-tab">
+                    <span class="icon">👥</span> Customers
+                </button>
+                <button class="nav-item" data-tab="products-tab">
+                    <span class="icon">🛍️</span> Products
+                </button>
+                <button class="nav-item" data-tab="campaigns-tab">
+                    <span class="icon">📢</span> Campaigns
+                </button>
+                <button class="nav-item" data-tab="settings-tab">
+                    <span class="icon">⚙️</span> Business Settings
+                </button>
+            </nav>
+            
+            <div class="sidebar-profile" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 1rem 0.75rem; border-top: 1px solid rgba(255,255,255,0.08); margin-top: auto;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                    <div class="profile-pic" id="nav-profile-pic" style="width: 32px; height: 32px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; background: #6366f1; border-radius: 50%; color: white; flex-shrink: 0;">A</div>
+                    <div class="profile-info" style="min-width: 0;">
+                        <div class="profile-name" id="nav-profile-name" style="font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; color: white;">Admin</div>
+                        <div class="profile-status" id="nav-profile-role" style="font-size: 0.7rem; color: #10b981; font-weight:500;">Owner</div>
+                    </div>
+                </div>
+                <button id="sidebar-logout-btn" title="Sign Out" style="background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 0.25rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.15)';" onmouseout="this.style.transform='scale(1)';">🚪</button>
+            </div>
+        </aside>
+
+        <!-- Main Screen -->
+        <main class="main-content">
+            <!-- Toast notification container -->
+            <div id="toast-container"></div>
+
+            <!-- DASHBOARD SCREEN -->
+            <section id="dashboard-tab" class="tab-content active-tab">
+                <div class="screen-header">
+                    <div>
+                        <h1>Sales Overview</h1>
+                        <p class="subtitle">Real-time business performance metrics and recent operations.</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="switchTab('create-bill-tab')">
+                        <span>+</span> Create New Invoice
+                    </button>
+                </div>
+                
+                <!-- Stat Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Total Sales (Today)</span>
+                            <span class="stat-icon">💰</span>
+                        </div>
+                        <div class="stat-value" id="stat-sales">₹0.00</div>
+                        <div class="stat-trend trend-up">⚡ Real-time updates</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Invoices Sent</span>
+                            <span class="stat-icon">📑</span>
+                        </div>
+                        <div class="stat-value" id="stat-invoices">0</div>
+                        <div class="stat-trend text-secondary">All-time count</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Unique Customers</span>
+                            <span class="stat-icon">👥</span>
+                        </div>
+                        <div class="stat-value" id="stat-customers">0</div>
+                        <div class="stat-trend trend-up">⭐ Active customer pool</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Payment Pending</span>
+                            <span class="stat-icon">🕒</span>
+                        </div>
+                        <div class="stat-value text-warning" id="stat-pending">0</div>
+                        <div class="stat-trend text-warning">Requires follow-up</div>
+                    </div>
+                </div>
+
+                <!-- Sleek Sales Analytics Charts Container (Owner Only) -->
+                <div class="analytics-grid" id="dashboard-analytics-container" style="display: grid; grid-template-columns: 2fr 1.2fr; gap: 1.25rem; margin-top: 1.5rem; margin-bottom: 1.5rem;">
+                    <div class="card glass-pane" style="grid-column: span 2; position: relative;">
+                        <div class="card-header-actions" style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                            <h2 class="card-title" style="margin: 0; font-size: 1.1rem; font-weight: 600;"><span class="icon">📈</span> Revenue Trend (Last 30 Days)</h2>
+                            <span class="badge badge-paid" style="font-size: 0.7rem; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">Daily Settlements</span>
+                        </div>
+                        <div style="position: relative; height: 260px; width: 100%;">
+                            <canvas id="chart-sales-trend"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card glass-pane" style="position: relative; display: flex; flex-direction: column;">
+                        <div class="card-header-actions" style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                            <h2 class="card-title" style="margin: 0; font-size: 1.1rem; font-weight: 600;"><span class="icon">💳</span> Payment Split</h2>
+                            <span class="badge" style="font-size: 0.7rem; background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3);">Volume Shares</span>
+                        </div>
+                        <div style="position: relative; height: 180px; width: 100%; margin: auto;">
+                            <canvas id="chart-payment-dist"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card glass-pane" style="position: relative; display: flex; flex-direction: column;">
+                        <div class="card-header-actions" style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                            <h2 class="card-title" style="margin: 0; font-size: 1.1rem; font-weight: 600;"><span class="icon">🏆</span> Top Products</h2>
+                            <span class="badge" style="font-size: 0.7rem; background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">Best Sellers</span>
+                        </div>
+                        <div style="position: relative; height: 180px; width: 100%; margin: auto;">
+                            <canvas id="chart-top-products"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Table -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Recent Invoices</h2>
+                        <a href="#" class="panel-link" onclick="switchTab('invoices-tab')">View All</a>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-invoices-tbody">
+                                <tr>
+                                    <td colspan="6" class="table-empty">No invoices generated yet. Click "Create Invoice" to begin!</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CREATE BILL (POS) SCREEN -->
+            <section id="create-bill-tab" class="tab-content">
+                <div class="screen-header">
+                    <div>
+                        <h1>Invoice Generator</h1>
+                        <p class="subtitle">Quick billing POS dashboard. Formulate line items and send directly to customer WhatsApp.</p>
+                    </div>
+                </div>
+
+                <div class="pos-grid">
+                    <!-- POS Creation Form Left -->
+                    <div class="pos-form">
+                        <!-- Customer Selection Pane -->
+                        <div class="card glass-pane">
+                            <h2 class="card-title"><span class="icon">👥</span> Customer Details</h2>
+                            <div class="form-grid">
+                                <div class="form-group autocomplete-container">
+                                    <label for="pos-cust-name">Customer Name *</label>
+                                    <input type="text" id="pos-cust-name" placeholder="Enter customer name" required autocomplete="off">
+                                    <div id="customer-suggestions" class="suggestions-dropdown"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pos-cust-phone">WhatsApp Number *</label>
+                                    <input type="text" id="pos-cust-phone" placeholder="e.g. +91 98765 43210" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pos-cust-email">Email (Optional)</label>
+                                    <input type="email" id="pos-cust-email" placeholder="customer@email.com">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pos-cust-address">Address (Optional)</label>
+                                    <input type="text" id="pos-cust-address" placeholder="Billing location details">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Billing Items Pane -->
+                        <div class="card glass-pane mt-4">
+                            <div class="card-header-actions">
+                                <h2 class="card-title"><span class="icon">🛍️</span> Billing Items</h2>
+                                <button type="button" class="btn btn-sm btn-outline" id="add-item-btn">+ Add Item</button>
+                            </div>
+                            
+                            <div class="items-list-container">
+                                <div class="pos-item-header">
+                                    <div style="flex: 2.5;">Item Name *</div>
+                                    <div style="flex: 0.8; text-align: center;">Qty</div>
+                                    <div style="flex: 1.2;">Rate (Unit)</div>
+                                    <div style="flex: 0.9;">Tax %</div>
+                                    <div style="flex: 0.9;">Disc %</div>
+                                    <div style="flex: 1.2; text-align: right;">Total</div>
+                                    <div style="flex: 0.4;"></div>
+                                </div>
+                                
+                                <div id="pos-items-rows" class="pos-items-rows">
+                                    <!-- Dynamic Rows Inserted Here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notes & Payments Pane -->
+                        <div class="card glass-pane mt-4">
+                            <h2 class="card-title"><span class="icon">💳</span> Payment & Details</h2>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="pos-payment-method">Payment Mode</label>
+                                    <select id="pos-payment-method">
+                                        <option value="UPI" selected>UPI (GPay / PhonePe / Paytm)</option>
+                                        <option value="Cash">Cash</option>
+                                        <option value="Card">Credit/Debit Card</option>
+                                        <option value="Net Banking">Net Banking</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pos-notes">Invoice Notes (Optional)</label>
+                                    <input type="text" id="pos-notes" placeholder="e.g. Terms & conditions, warranty info">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visual Receipt Preview Right -->
+                    <div class="pos-preview">
+                        <div class="receipt-preview-container">
+                            <div class="receipt-header-badge">Live Receipt Preview</div>
+                            
+                            <!-- Receipt Graphic Mockup -->
+                            <div class="receipt-graphic" id="receipt-graphic-mock">
+                                <div class="r-header">
+                                    <div class="r-logo-spot" id="r-preview-logo">B</div>
+                                    <h3 id="r-preview-biz-name">Alpha Retailers</h3>
+                                    <p id="r-preview-biz-address" style="font-size: 0.75rem; color: var(--text-secondary);">102, Nebula Heights, Mumbai</p>
+                                    <div class="r-badge-pending">Pending Payment</div>
+                                </div>
+                                
+                                <div class="r-divider">--------------------------------</div>
+                                
+                                <div class="r-info-rows">
+                                    <div class="r-info-row"><span>Bill No:</span> <span id="r-preview-bill-no">DRAFT</span></div>
+                                    <div class="r-info-row"><span>Date:</span> <span id="r-preview-date">25-May-2026</span></div>
+                                    <div class="r-info-row"><span>Client:</span> <span id="r-preview-cust-name">-</span></div>
+                                    <div class="r-info-row"><span>Contact:</span> <span id="r-preview-cust-phone">-</span></div>
+                                </div>
+                                
+                                <div class="r-divider">--------------------------------</div>
+                                
+                                <div class="r-items-table">
+                                    <div class="r-items-header">
+                                        <div>Item</div>
+                                        <div style="text-align: center;">Qty</div>
+                                        <div style="text-align: right;">Total</div>
+                                    </div>
+                                    <div id="r-preview-items-body">
+                                        <div class="r-item-empty">No items added yet</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="r-divider">--------------------------------</div>
+                                
+                                <div class="r-totals">
+                                    <div class="r-total-row"><span>Subtotal:</span> <span id="r-preview-subtotal">₹0.00</span></div>
+                                    <div class="r-total-row text-danger"><span>Discount:</span> <span id="r-preview-discount">-₹0.00</span></div>
+                                    <div class="r-total-row"><span>Tax:</span> <span id="r-preview-tax">+₹0.00</span></div>
+                                    <div class="r-total-row grand-total"><span>Grand Total:</span> <span id="r-preview-grand">₹0.00</span></div>
+                                </div>
+                                
+                                <div class="r-divider">--------------------------------</div>
+                                
+                                <div class="r-footer">
+                                    <p>Powered by BillFlow WA</p>
+                                    <p>Your payment QR code will be generated on submission!</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Invoice Actions Box -->
+                        <div class="action-buttons-box mt-4">
+                            <button type="button" class="btn btn-primary btn-lg w-100" id="btn-save-send">
+                                <span>💬</span> Save & Send to WhatsApp
+                            </button>
+                            <button type="button" class="btn btn-secondary w-100 mt-2" id="btn-save-only">
+                                <span>💾</span> Save Invoice (Print Mode)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- INVOICES DIRECTORY TAB -->
+            <section id="invoices-tab" class="tab-content">
+                <div class="screen-header">
+                    <div>
+                        <h1>Invoice Registry</h1>
+                        <p class="subtitle">Search, print, resend, or delete existing business bills.</p>
+                    </div>
+                    <div class="search-actions">
+                        <input type="text" id="invoice-search-input" class="search-input" placeholder="Search Invoice No. or Customer...">
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Payment Method</th>
+                                    <th>Grand Total</th>
+                                    <th>Status</th>
+                                    <th>Quick Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoices-list-tbody">
+                                <tr>
+                                    <td colspan="7" class="table-empty">Loading registry...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CUSTOMERS DIRECTORY TAB -->
+            <section id="customers-tab" class="tab-content">
+                <div class="screen-header">
+                    <div>
+                        <h1>Customer Directory</h1>
+                        <p class="subtitle">Complete profile details and history of shoppers.</p>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>WhatsApp Number</th>
+                                    <th>Email</th>
+                                    <th>Address</th>
+                                    <th>Joined On</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customers-list-tbody">
+                                <tr>
+                                    <td colspan="5" class="table-empty">Loading customer base...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PRODUCTS CATALOG SCREEN -->
+            <section id="products-tab" class="tab-content">
+                <div class="screen-header">
+                    <div>
+                        <h1>Products Catalog</h1>
+                        <p class="subtitle">Manage store profiling defaults, rate structures, and real-time inventory counts.</p>
+                    </div>
+                </div>
+
+                <div class="settings-grid">
+                    <!-- Product Creation Form Left -->
+                    <div class="card glass-pane">
+                        <h2 class="card-title" id="prod-form-title"><span class="icon">🛍️</span> Add Product Entry</h2>
+                        
+                        <form id="product-form">
+                            <input type="hidden" id="prod-id" value="">
+                            <div class="form-grid">
+                                <div class="form-group col-span-2">
+                                    <label for="prod-name">Product / Service Name *</label>
+                                    <input type="text" id="prod-name" placeholder="e.g. Premium Leather Wallet" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="prod-sku">SKU Code (Optional)</label>
+                                    <input type="text" id="prod-sku" placeholder="e.g. WALLET-01">
+                                </div>
+                                <div class="form-group">
+                                    <label for="prod-rate">Unit Rate *</label>
+                                    <input type="number" id="prod-rate" placeholder="0.00" min="0" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="prod-tax">Default Tax %</label>
+                                    <input type="number" id="prod-tax" value="18" min="0" max="100" step="any">
+                                </div>
+                                <div class="form-group">
+                                    <label for="prod-stock">Initial Stock Level</label>
+                                    <input type="number" id="prod-stock" value="10" min="0">
+                                </div>
+                            </div>
+
+                            <div class="mt-6 flex-row gap-2" style="display:flex; gap:0.5rem;">
+                                <button type="submit" class="btn btn-primary w-100" id="prod-submit-btn">Save Product</button>
+                                <button type="button" class="btn btn-secondary w-100" id="prod-clear-btn" style="display:none;">Cancel Edit</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Products Directory Table Right -->
+                    <div class="panel flex-column" style="margin-bottom: 0;">
+                        <div class="panel-header">
+                            <h2>Catalog Listings</h2>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>SKU</th>
+                                        <th>Product Name</th>
+                                        <th>Rate</th>
+                                        <th>Tax %</th>
+                                        <th style="text-align: center;">Stock</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="products-list-tbody">
+                                    <tr>
+                                        <td colspan="6" class="table-empty">Loading products database...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CAMPAIGNS (MASS MESSAGING) SCREEN -->
+            <section id="campaigns-tab" class="tab-content">
+                <div class="screen-header">
+                    <div>
+                        <h1>Campaign Broadcasts</h1>
+                        <p class="subtitle">Compose promotional announcements and broadcast them to your customer directory.</p>
+                    </div>
+                </div>
+
+                <div class="settings-grid">
+                    <!-- Campaign Creation Form Left -->
+                    <div class="card glass-pane">
+                        <h2 class="card-title"><span class="icon">📢</span> Compose Broadcast Campaign</h2>
+                        
+                        <form id="campaign-form">
+                            <div class="form-group">
+                                <label for="camp-title">Campaign Title / Description *</label>
+                                <input type="text" id="camp-title" placeholder="e.g. Summer Clearance Sale 20% Off" required>
+                            </div>
+                            
+                            <div class="form-group mt-4">
+                                <label for="camp-message">Broadcast Template Message *</label>
+                                <textarea id="camp-message" rows="6" placeholder="Hello *{customer_name}*,&#10;&#10;We have a special surprise for you! 🎁&#10;Get flat 20% off on all items this weekend at *{business_name}*!&#10;&#10;Reply with YES to claim your coupon code.&#10;&#10;Have a great day!" required></textarea>
+                                <small class="form-help">Supported placeholders: <code>{customer_name}</code>, <code>{business_name}</code>. Surround words in asterisks <code>*word*</code> to make them bold in WhatsApp.</small>
+                            </div>
+                            
+                            <!-- Filter Target Audience -->
+                            <div class="form-group mt-4">
+                                <label for="camp-targets">Target Audience</label>
+                                <select id="camp-targets">
+                                    <option value="all" selected>All Registered Customers (<span id="camp-target-all-count">0</span>)</option>
+                                </select>
+                            </div>
+
+                            <div class="mt-6">
+                                <button type="submit" class="btn btn-primary w-100 btn-lg">Launch Campaign</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Live WhatsApp Mobile Preview Right -->
+                    <div class="card glass-pane flex-column justify-between">
+                        <!-- Default Mode: WhatsApp Mobile Mockup -->
+                        <div id="camp-preview-mode">
+                            <h2 class="card-title"><span class="icon">📱</span> Broadcast Text Mockup</h2>
+                            <p class="subtitle">Visual preview of the message as seen by the customer.</p>
+                            
+                            <div class="whatsapp-chat-container">
+                                <div class="chat-header">
+                                    <div class="chat-avatar">📢</div>
+                                    <div class="chat-title">
+                                        <div class="chat-name" id="camp-wa-preview-cust">Customer Name</div>
+                                        <div class="chat-status">Broadcast Channel</div>
+                                    </div>
+                                </div>
+                                <div class="chat-body">
+                                    <div class="chat-bubble received">
+                                        <div class="bubble-text" id="camp-wa-text-preview">
+                                            Hello Customer, <br><br>Compose your campaign message to preview...
+                                        </div>
+                                        <div class="bubble-time">10:35 PM ✓✓</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Queue Sending Active Panel Mode (Swapped on campaign launch) -->
+                        <div id="camp-queue-mode" style="display: none; width: 100%;">
+                            <h2 class="card-title text-warning"><span class="icon">⚡</span> Broadcast Dispatcher Active</h2>
+                            <p class="subtitle">Dispatched messages manually via direct redirection. Do not close this page.</p>
+                            
+                            <div class="stats-grid mt-4" style="grid-template-columns: 1fr 1fr;">
+                                <div class="stat-card" style="padding: 1rem;">
+                                    <div class="stat-header">Dispatched</div>
+                                    <div class="stat-value" id="camp-queue-sent" style="font-size: 1.5rem;">0</div>
+                                </div>
+                                <div class="stat-card" style="padding: 1rem;">
+                                    <div class="stat-header">Total Queue</div>
+                                    <div class="stat-value" id="camp-queue-total" style="font-size: 1.5rem;">0</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Modern Progress Bar -->
+                            <div class="progress-bar-container mt-4" style="background: rgba(255,255,255,0.06); height: 12px; border-radius: 9999px; overflow: hidden; position: relative;">
+                                <div id="camp-queue-progress-bar" style="background: linear-gradient(90deg, var(--primary), var(--secondary)); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+                            </div>
+                            
+                            <div class="card glass-pane mt-4" style="background: rgba(255,255,255,0.02); padding: 1.25rem;">
+                                <h4 style="font-family: var(--font-alt); font-weight: 700; margin-bottom: 0.5rem;">Next Recipient:</h4>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div id="camp-queue-next-name" style="font-weight: 600;">Rahul Sharma</div>
+                                        <div id="camp-queue-next-phone" style="font-size: 0.75rem; color: var(--text-secondary); font-family: var(--font-mono);">+91 99999 88888</div>
+                                    </div>
+                                    <button class="btn btn-primary" id="camp-queue-dispatch-btn" style="box-shadow: 0 4px 15px var(--primary-glow);">
+                                        <span>💬</span> Dispatch
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex-row gap-2" style="display: flex; gap: 0.5rem;">
+                                <button class="btn btn-secondary w-100" id="camp-queue-pause-btn">Pause</button>
+                                <button class="btn btn-outline w-100" id="camp-queue-cancel-btn" style="color: var(--danger); border-color: var(--danger);">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campaign Broadcast History Panel -->
+                <div class="panel mt-6">
+                    <div class="panel-header">
+                        <h2>Campaign History Logs</h2>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Campaign Name</th>
+                                    <th>Message Preview</th>
+                                    <th>Joined Date</th>
+                                    <th>Delivered</th>
+                                    <th>Target pool</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="campaigns-list-tbody">
+                                <tr>
+                                    <td colspan="7" class="table-empty">No campaign history found.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SETTINGS TAB -->
+            <section id="settings-tab" class="tab-content">
+                <div class="screen-header">
+                    <div>
+                        <h1>Store Configuration</h1>
+                        <p class="subtitle">Manage store profiling, branding, UPI payments, and personalized WhatsApp messages.</p>
+                    </div>
+                </div>
+
+                <div class="settings-grid">
+                    <!-- Config Form -->
+                    <div class="card glass-pane">
+                        <h2 class="card-title"><span class="icon">⚙️</span> Business Information</h2>
+                        
+                        <form id="settings-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="set-biz-name">Business Name *</label>
+                                    <input type="text" id="set-biz-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="set-owner-name">Owner / Manager Name</label>
+                                    <input type="text" id="set-owner-name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="set-biz-phone">Business Phone Number</label>
+                                    <input type="text" id="set-biz-phone">
+                                </div>
+                                <div class="form-group">
+                                    <label for="set-biz-email">Support Email Address</label>
+                                    <input type="email" id="set-biz-email">
+                                </div>
+                                <div class="form-group col-span-2">
+                                    <label for="set-biz-address">Physical Store Address</label>
+                                    <textarea id="set-biz-address" rows="2"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="set-biz-logo">Business Logo URL</label>
+                                    <input type="url" id="set-biz-logo" placeholder="https://image-link.com/logo.png">
+                                </div>
+                                <div class="form-group">
+                                    <label for="set-currency">Default Currency Symbol</label>
+                                    <input type="text" id="set-currency" maxlength="5" placeholder="e.g. ₹, $, AED">
+                                </div>
+                                <div class="form-group">
+                                    <label for="set-tax-label">Tax ID Label (e.g. GSTIN, VAT ID)</label>
+                                    <input type="text" id="set-tax-label" placeholder="GSTIN">
+                                </div>
+                                <div class="form-group">
+                                    <label for="set-tax-number">Tax ID Number</label>
+                                    <input type="text" id="set-tax-number" placeholder="e.g. 27AAACB1234C1ZN">
+                                </div>
+                            </div>
+
+                            <h2 class="card-title mt-6"><span class="icon">💳</span> UPI Payment Gateway</h2>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="set-upi-id">UPI ID for Digital Invoices *</label>
+                                    <input type="text" id="set-upi-id" placeholder="e.g. pay@bank, owner@upi">
+                                    <small class="form-help">Critical: Enabling this will automatically generate Scan-to-Pay QR Codes on the digital receipt.</small>
+                                </div>
+                            </div>
+
+                            <h2 class="card-title mt-6"><span class="icon">💬</span> WhatsApp Message Template</h2>
+                            <div class="form-group">
+                                <label for="set-wa-template">Invoice WhatsApp Template Message</label>
+                                <textarea id="set-wa-template" rows="6"></textarea>
+                                <small class="form-help">Supported Placeholders: <code>{customer_name}</code>, <code>{business_name}</code>, <code>{invoice_number}</code>, <code>{currency}</code>, <code>{total_amount}</code>, <code>{invoice_url}</code>. Bold words in WhatsApp are enclosed in asterisks <code>*word*</code>.</small>
+                            </div>
+
+                            <div class="mt-6">
+                                <button type="submit" class="btn btn-primary">Save Store Configuration</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Template Message Preview Box Right -->
+                    <div class="card glass-pane flex-column justify-between">
+                        <div>
+                            <h2 class="card-title"><span class="icon">📱</span> WhatsApp Mockup</h2>
+                            <p class="subtitle">Live demonstration of the text message sent to the client.</p>
+                            
+                            <div class="whatsapp-chat-container">
+                                <div class="chat-header">
+                                    <div class="chat-avatar">💬</div>
+                                    <div class="chat-title">
+                                        <div class="chat-name" id="set-wa-preview-cust">Customer</div>
+                                        <div class="chat-status">WhatsApp Business Business Account</div>
+                                    </div>
+                                </div>
+                                <div class="chat-body">
+                                    <div class="chat-bubble received">
+                                        <div class="bubble-text" id="set-wa-text-preview">
+                                            Hello Customer, <br><br>Loading template...
+                                        </div>
+                                        <div class="bubble-time">10:30 PM ✓✓</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info mt-4">
+                            <strong>Note on Redirection Mode:</strong> When you press 'Save & Send to WhatsApp', BillFlow WA initiates a WhatsApp redirect link. This instantly opens WhatsApp on desktop or mobile pre-loaded with this text and target contact. Zero API fees!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Directory Panel (Owner-Only) -->
+                <div class="card glass-pane mt-6" id="settings-user-directory-card" style="display: none;">
+                    <h2 class="card-title" style="font-size:1.2rem; margin-bottom:0.25rem;"><span class="icon">👥</span> Staff Account Directory</h2>
+                    <p class="subtitle" style="margin-bottom: 1.5rem;">Provision and manage secure access logins for cashiers, staff members, and store owners.</p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 1.5rem; align-items: start;">
+                        <!-- Add User Form -->
+                        <form id="add-user-form" style="display: flex; flex-direction: column; gap: 1rem; padding: 1rem; border: 1px solid rgba(255,255,255,0.06); border-radius:8px; background:rgba(255,255,255,0.02);">
+                            <h3 style="font-size: 0.95rem; font-weight:600; color: white; margin: 0 0 0.5rem 0;">➕ Create Access Account</h3>
+                            <div class="form-group">
+                                <label for="user-username" style="font-size: 0.75rem; color: var(--text-secondary);">Username *</label>
+                                <input type="text" id="user-username" placeholder="e.g. cashier1" required style="width:100%; padding:0.5rem; font-size:0.85rem;">
+                            </div>
+                            <div class="form-group">
+                                <label for="user-name" style="font-size: 0.75rem; color: var(--text-secondary);">Full Name *</label>
+                                <input type="text" id="user-name" placeholder="e.g. Siddharth Sharma" required style="width:100%; padding:0.5rem; font-size:0.85rem;">
+                            </div>
+                            <div class="form-group">
+                                <label for="user-password" style="font-size: 0.75rem; color: var(--text-secondary);">Password *</label>
+                                <input type="password" id="user-password" placeholder="Min 6 characters" required style="width:100%; padding:0.5rem; font-size:0.85rem;">
+                            </div>
+                            <div class="form-group">
+                                <label for="user-role" style="font-size: 0.75rem; color: var(--text-secondary);">Access Role *</label>
+                                <select id="user-role" style="width:100%; padding:0.5rem; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.15); color:white; border-radius:6px; font-size:0.85rem;">
+                                    <option value="Staff">Staff (POS Clerk - Add/Edit Inventory)</option>
+                                    <option value="Owner">Owner (Full Admin Access)</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm mt-2" style="padding: 0.6rem;">Provision Account</button>
+                        </form>
+                        
+                        <!-- Users List Table -->
+                        <div class="table-container" style="border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; margin: 0;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Username</th>
+                                        <th>Role</th>
+                                        <th style="text-align: right;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-list-tbody">
+                                    <tr>
+                                        <td colspan="4" class="table-empty">Loading active users directory...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Glowing Glassmorphic Login Overlay -->
+    <div id="login-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #0f172a 0%, #020617 100%); z-index: 99999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+        <!-- Glowing background decoration -->
+        <div style="position: absolute; width: 300px; height: 300px; background: rgba(99, 102, 241, 0.15); border-radius: 50%; filter: blur(80px); top: 20%; left: 30%; pointer-events: none;"></div>
+        <div style="position: absolute; width: 250px; height: 250px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; filter: blur(80px); bottom: 20%; right: 30%; pointer-events: none;"></div>
+        
+        <div class="card glass-pane" style="width: 100%; max-width: 400px; padding: 2.5rem; text-align: center; border: 1px solid rgba(99,102,241,0.2); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);">
+            <div class="logo-icon" style="font-size: 3rem; margin-bottom: 0.5rem; color: #6366f1; text-shadow: 0 0 20px rgba(99,102,241,0.5); display: inline-block;">⚡</div>
+            <h1 style="font-size: 1.75rem; font-weight: 800; color: white; margin-bottom: 0.25rem;">BillFlow<span style="color:#6366f1">WA</span></h1>
+            <p class="subtitle" style="margin-bottom: 2rem;">Secure Staff & Owner Billing Login</p>
+            
+            <!-- Interactive Login Error Alert -->
+            <div id="login-error-alert" style="display: none; text-align: left; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); border-left: 4px solid #ef4444; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.85rem; color: #fca5a5; animation: alertFadeIn 0.3s ease;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1rem;">⚠️</span>
+                    <span id="login-error-text">Invalid username or password.</span>
+                </div>
+            </div>
+            
+            <form id="login-form" onsubmit="event.preventDefault();" style="display: flex; flex-direction: column; gap: 1.25rem; text-align: left;">
+                <div class="form-group">
+                    <label for="login-username" style="color: rgba(255,255,255,0.7); font-size: 0.8rem; font-weight: 500; margin-bottom: 0.3rem; display: block;">Username</label>
+                    <input type="text" id="login-username" placeholder="Enter username" required style="width: 100%; padding: 0.75rem 1rem; border-radius: 8px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.15); color: white; font-size: 0.95rem; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#6366f1';" onblur="this.style.borderColor='rgba(255,255,255,0.15)';">
+                </div>
+                <div class="form-group">
+                    <label for="login-password" style="color: rgba(255,255,255,0.7); font-size: 0.8rem; font-weight: 500; margin-bottom: 0.3rem; display: block;">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter password" required style="width: 100%; padding: 0.75rem 1rem; border-radius: 8px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.15); color: white; font-size: 0.95rem; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#6366f1';" onblur="this.style.borderColor='rgba(255,255,255,0.15)';">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; border-radius: 8px; font-weight: 600; margin-top: 1rem; cursor: pointer; background: #6366f1; border: none; color: white;">Access Dashboard</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script file -->
+    <script src="/app.js?v=1.0.4"></script>
+</body>
+</html>
