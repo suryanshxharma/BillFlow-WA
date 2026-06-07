@@ -590,6 +590,22 @@ async function loadBusinessProfile() {
     if (data) {
         currentBusiness = data;
         
+        // Tier UI logic
+        const productsTab = document.querySelector('[data-tab="products-tab"]');
+        const campaignsTab = document.querySelector('[data-tab="campaigns-tab"]');
+
+        if (currentBusiness.tier === "Base") {
+            if (productsTab) productsTab.style.display = 'none';
+            if (campaignsTab) campaignsTab.style.display = 'none';
+        } else if (currentBusiness.tier === "Mid") {
+            if (productsTab) productsTab.style.display = 'flex';
+            if (campaignsTab) campaignsTab.style.display = 'none';
+        } else {
+            if (productsTab) productsTab.style.display = 'flex';
+            if (campaignsTab) campaignsTab.style.display = 'flex';
+        }
+
+
         // Sync Sidebar Profile UI
         document.getElementById('nav-profile-name').innerText = currentBusiness.name;
         document.getElementById('nav-profile-pic').innerText = currentBusiness.name.charAt(0).toUpperCase();
@@ -848,7 +864,12 @@ function addPOSItemRow() {
             return;
         }
         
-        const matches = await API.get(`/api/products/search?q=${encodeURIComponent(query)}`);
+        let matches = [];
+        try {
+            matches = await API.get(`/api/products/search?q=${encodeURIComponent(query)}`) || [];
+        } catch (e) {
+            console.error(e);
+        }
         if (matches && matches.length > 0) {
             suggestionsBox.innerHTML = '';
             matches.forEach(prod => {
