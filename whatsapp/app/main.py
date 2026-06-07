@@ -56,7 +56,8 @@ def get_or_create_default_business(db: Session) -> Business:
             upi_id="suryansh@upi",
             tax_id_label="GSTIN",
             tax_id_number="27AAACB1234C1ZN",
-            wa_api_gateway="redirect"
+            wa_api_gateway="redirect",
+            tier="Top"
         )
         db.add(business)
         db.commit()
@@ -83,6 +84,21 @@ def on_startup():
     db = next(get_db())
     get_or_create_default_business(db)
     seed_default_admin(db)
+
+
+def get_business_tier(db: Session = Depends(get_db)):
+    business = get_or_create_default_business(db)
+    return business.tier
+
+def check_tier_for_products(db: Session = Depends(get_db)):
+    tier = get_business_tier(db)
+    if tier not in ["Mid", "Top"]:
+        raise HTTPException(status_code=403, detail="Upgrade to Mid or Top tier to access Inventory")
+
+def check_tier_for_campaigns(db: Session = Depends(get_db)):
+    tier = get_business_tier(db)
+    if tier != "Top":
+        raise HTTPException(status_code=403, detail="Upgrade to Top tier to access Mass WhatsApp Campaigns")
 
 # --- AUTHORIZATION DEPENDENCIES ---
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)) -> User:
@@ -156,6 +172,7 @@ class BusinessResponse(BaseModel):
     tax_id_number: Optional[str]
     whatsapp_template: str
     wa_api_gateway: str
+    tier: str
 
     class Config:
         from_attributes = True
@@ -604,10 +621,12 @@ def delete_invoice(invoice_id: int, db: Session = Depends(get_db), owner: User =
 # 7. CAMPAIGNS (MASS MESSAGING) (Owner-Only)
 @app.get("/api/campaigns", response_model=List[CampaignResponse])
 def list_campaigns(db: Session = Depends(get_db), owner: User = Depends(get_owner_user)):
+    check_tier_for_campaigns(db)
     return db.query(Campaign).order_by(desc(Campaign.created_at)).all()
 
 @app.post("/api/campaigns", response_model=CampaignResponse)
 def create_campaign(data: CampaignCreate, db: Session = Depends(get_db), owner: User = Depends(get_owner_user)):
+    check_tier_for_campaigns(db)
     campaign = Campaign(
         title=data.title,
         message_template=data.message_template,
@@ -622,6 +641,7 @@ def create_campaign(data: CampaignCreate, db: Session = Depends(get_db), owner: 
 
 @app.put("/api/campaigns/{campaign_id}/progress", response_model=CampaignResponse)
 def update_campaign_progress(campaign_id: int, data: CampaignProgressUpdate, db: Session = Depends(get_db), owner: User = Depends(get_owner_user)):
+    check_tier_for_campaigns(db)
     campaign = db.query(Campaign).filter(Campaign.id == campaign_id).first()
     if not campaign:
         raise HTTPException(status_code=404, detail="Campaign not found")
@@ -633,6 +653,7 @@ def update_campaign_progress(campaign_id: int, data: CampaignProgressUpdate, db:
 
 @app.delete("/api/campaigns/{campaign_id}")
 def delete_campaign(campaign_id: int, db: Session = Depends(get_db), owner: User = Depends(get_owner_user)):
+    check_tier_for_campaigns(db)
     campaign = db.query(Campaign).filter(Campaign.id == campaign_id).first()
     if not campaign:
         raise HTTPException(status_code=404, detail="Campaign not found")
@@ -644,10 +665,12 @@ def delete_campaign(campaign_id: int, db: Session = Depends(get_db), owner: User
 # 8. PRODUCTS & INVENTORY (Owner & Staff CRUD, Deletion Owner-Only)
 @app.get("/api/products", response_model=List[ProductResponse])
 def list_products(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    check_tier_for_products(db)
     return db.query(Product).order_by(Product.name).all()
 
 @app.get("/api/products/search", response_model=List[ProductResponse])
 def search_products(q: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    check_tier_for_products(db)
     return db.query(Product).filter(
         or_(
             Product.name.ilike(f"%{q}%"),
@@ -657,6 +680,7 @@ def search_products(q: str, db: Session = Depends(get_db), current_user: User = 
 
 @app.post("/api/products", response_model=ProductResponse)
 def create_product(data: ProductCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    check_tier_for_products(db)
     # Staff or Owner is authorized to ADD products to catalog
     existing = db.query(Product).filter(Product.name.ilike(data.name)).first()
     if existing:
@@ -680,6 +704,7 @@ def create_product(data: ProductCreate, db: Session = Depends(get_db), current_u
 
 @app.put("/api/products/{product_id}", response_model=ProductResponse)
 def update_product(product_id: int, data: ProductUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    check_tier_for_products(db)
     # Staff or Owner is authorized to EDIT products in catalog
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
@@ -707,6 +732,7 @@ def update_product(product_id: int, data: ProductUpdate, db: Session = Depends(g
 
 @app.delete("/api/products/{product_id}")
 def delete_product(product_id: int, db: Session = Depends(get_db), owner: User = Depends(get_owner_user)):
+    check_tier_for_products(db)
     # Strictly Owner-Only to delete product catalog entries
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
