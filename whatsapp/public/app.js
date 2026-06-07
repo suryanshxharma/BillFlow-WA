@@ -593,7 +593,7 @@ async function loadBusinessProfile() {
         // Tier UI logic
         const productsTab = document.querySelector('[data-tab="products-tab"]');
         const campaignsTab = document.querySelector('[data-tab="campaigns-tab"]');
-
+        
         if (currentBusiness.tier === "Base") {
             if (productsTab) productsTab.style.display = 'none';
             if (campaignsTab) campaignsTab.style.display = 'none';
@@ -605,7 +605,7 @@ async function loadBusinessProfile() {
             if (campaignsTab) campaignsTab.style.display = 'flex';
         }
 
-
+        
         // Sync Sidebar Profile UI
         document.getElementById('nav-profile-name').innerText = currentBusiness.name;
         document.getElementById('nav-profile-pic').innerText = currentBusiness.name.charAt(0).toUpperCase();
