@@ -1,0 +1,32 @@
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# SQLite Database (optional - uncomment if you want to keep db local only)
+# billflow.db
+
+# Temporary / Scratch Files
+scratch/test_*.py
+scratch/parse_edits.py
+scratch/validate_js.py
+
+# Credentials and sensitive files
+*.pdf
+token
+credentials
