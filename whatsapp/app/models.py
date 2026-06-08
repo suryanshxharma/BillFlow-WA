@@ -18,7 +18,6 @@ class Business(Base):
     upi_id = Column(String, nullable=True)   # Merchant UPI ID for QR payments, e.g. merchant@upi
     tax_id_label = Column(String, default="GSTIN") # e.g. GSTIN, VAT, Tax ID
     tax_id_number = Column(String, nullable=True)
-    tier = Column(String, default="Top") # Base, Mid, Top
     
     # WhatsApp configuration
     whatsapp_template = Column(
