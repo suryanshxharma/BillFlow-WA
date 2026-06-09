@@ -1,12 +1,3 @@
----
-title: BillFlow WA
-emoji: 🏆
-colorFrom: pink
-colorTo: red
-sdk: docker
-pinned: false
----
-
 # ⚡ BillFlow WA: Modern WhatsApp Billing & Digital Receipt SaaS
 
 BillFlow WA is an ultra-premium, modern, and highly responsive Billing and WhatsApp Automation platform designed specifically for retail shops, restaurants, service agencies, and small-to-medium businesses. 
@@ -16,7 +7,6 @@ It is designed to be lightweight, incredibly fast, and 100% ready for white-labe
 ---
 
 ## 🌟 Premium Features
-
 1. **Store Configuration & White-labeling**:
    - Customize store name, manager details, currency symbols, and address.
    - Upload branding logos displayed instantly on hosted receipts.
@@ -91,21 +81,3 @@ python3 -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 - **Interactive API Documentation (Swagger)**: Open `http://localhost:8000/docs` to inspect backend endpoints.
 
 ---
-
-## 💰 Reselling Opportunities
-
-You can package and monetize BillFlow WA in several lucrative ways:
-
-1. **Local Self-Hosted POS Installation (One-Time Sale)**:
-   - Package the backend and public assets together and install it on store computer systems.
-   - Run the server in the background and place a shortcut icon on their desktop linking to `http://localhost:8000`.
-   - Charge a premium one-time setup fee + yearly maintenance/support contracts (e.g. ₹5,000 - ₹15,000 / shop).
-
-2. **Centralized Cloud SaaS (Monthly Subscription)**:
-   - Deploy the FastAPI backend on a single Linux cloud virtual private server (e.g., DigitalOcean, AWS, Heroku) connected to a PostgreSQL database instance.
-   - Scale the database tables to support multi-tenant user authentication (multi-business login).
-   - Charge merchants a monthly recurring fee (SaaS) to access their account (e.g. ₹500 - ₹1,500 / month).
-
-3. **Custom Restaurant / Service Industry POS**:
-   - Customize the template views to support kitchen ordering tickets (KOT) or service scheduling.
-   - White-label the logo, font selection, and color palettes to match premium high-end brands.
