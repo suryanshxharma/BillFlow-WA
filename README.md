@@ -82,3 +82,4 @@ python3 -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 - **Interactive API Documentation (Swagger)**: Open `http://localhost:8000/docs` to inspect backend endpoints.
 
 ---
+## The app is currently hosted on 'https://huggingface.co/spaces/suryanshxharma/BillFlow-WA'
