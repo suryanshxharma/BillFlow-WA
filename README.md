@@ -1,6 +1,6 @@
 # BillFlow WA: Modern WhatsApp Billing & Digital Receipt SaaS
 
-BillFlow WA is an ultra-premium, modern, and highly responsive Billing and WhatsApp Automation platform designed specifically for retail shops, restaurants, service agencies, and small-to-medium businesses. 
+BillFlow WA is an ultra-premium, modern, and highly responsive Billing and WhatsApp Automation platform designed specifically for retail shops, restaurants, service agencies, and small- to medium-sized businesses. 
 
 It is designed to be lightweight, incredibly fast, and 100% ready for white-labeling and reselling. You can host this platform as a centralized subscription SaaS, sell it as a premium local self-hosted desktop portal, or bundle it for specific industry verticals.
 
@@ -9,7 +9,7 @@ It is designed to be lightweight, incredibly fast, and 100% ready for white-labe
 ##  Premium Features
 
 1. **Store Configuration & White-labeling**:
-   - Customize store name, manager details, currency symbols, and address.
+   - Customise store name, manager details, currency symbols, and address.
    - Upload branding logos displayed instantly on hosted receipts.
    - Default tax labels (e.g. GSTIN, VAT ID) automatically printed.
 
@@ -30,7 +30,7 @@ It is designed to be lightweight, incredibly fast, and 100% ready for white-labe
 
 5. **Mass Broadcast Campaigns **:
    - **Dynamic Message Composer**: Write promotional text alerts or custom discounts using dynamic placeholders like `{customer_name}` and `{business_name}`.
-   - **Direct Redirection Queue Runner (Free & Safe)**: Broadcasts offers manually to your entire customer list without incurring API costs. A beautiful progressive runner lets you click "Dispatch" in sequence for each customer, auto-advancing as you progress.
+   - **Direct Redirection Queue Runner (Free & Safe)**: Broadcasts offers manually to your entire customer list without incurring API costs. A beautiful, progressive runner lets you click "Dispatch" for each customer in sequence, with auto-advancement as you progress.
    - **Campaign Persistent History Ledger**: Complete tracking of sent campaigns, target audience pools, progress indicators, and statuses.
 
 6. **Invoice & Customer Registry**:
@@ -40,13 +40,13 @@ It is designed to be lightweight, incredibly fast, and 100% ready for white-labe
 
 7. **Mini-Inventory Catalog Manager **:
    - Create a persistent database of store products containing SKUs, names, standard unit rates, tax percentages, and stock levels.
-   - **POS Item Autocomplete**: As you type item names in the POS creator, matching products from the catalog are suggested. Clicking a suggestion auto-fills rates, default taxes, and live stock levels.
+   - **POS Item Autocomplete**: As you type item names in the POS creator, matching products from the catalogue are suggested. Clicking a suggestion auto-fills rates, default taxes, and live stock levels.
    - **Transactional Stock Auto-Deduction**: Submitting an invoice automatically decrements the respective product's stock levels in the database transaction, warning you when stock falls below 5 ("Low Stock") or reaches 0 ("Out of Stock").
 
 8. **UPI Confirmation Polling & Cash Chimes **:
    - **Interactive Receipt Checkouts**: Dynamic hosted digital receipts (`/receipt/{hash}`) feature a prominent glowing "Mark as Paid / Confirm UPI Payment" button.
    - **Background UPI Polling**: The merchant dashboard polls the database state in the background. If a customer confirms their payment on their receipt, the dashboard instantly detects the status change.
-   - **Web Audio Cash Register Double-Chime**: Instantly synthesizes a beautiful, offline-capable "Cha-Ching" double-chime tone natively using the browser's built-in **Web Audio API** (zero heavy external audio asset files or network lag!).
+   - **Web Audio Cash Register Double-Chime**: Instantly synthesises a beautiful, offline-capable "Cha-Ching" double-chime tone natively using the browser's built-in **Web Audio API** (zero heavy external audio asset files or network lag!).
    - **Real-Time Stat Updates**: Metrics, counters, and recent invoices tables refresh automatically upon receiving payment chimes.
 
 ---
