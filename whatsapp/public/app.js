@@ -806,16 +806,16 @@ function addPOSItemRow() {
     rowEl.id = `row-${id}`;
     
     rowEl.innerHTML = `
-        <div class="autocomplete-container">
-            <input type="text" placeholder="Product or Service Name" class="input-name" required autocomplete="off">
+        <div class="autocomplete-container" style="flex: 2.5; position: relative;">
+            <input type="text" placeholder="Product or Service Name" class="input-name" required autocomplete="off" style="width: 100%; box-sizing: border-box;">
             <span class="stock-indicator" style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem; display: none;"></span>
             <div class="suggestions-dropdown" style="display: none;"></div>
         </div>
-        <input type="number" style="flex: 0.8; text-align: center;" value="1" min="1" step="any" class="input-qty">
-        <input type="number" style="flex: 1.2;" placeholder="0.00" min="0" step="any" class="input-rate">
-        <input type="number" style="flex: 0.9;" value="18" min="0" max="100" step="any" class="input-tax">
-        <input type="number" style="flex: 0.9;" value="0" min="0" max="100" step="any" class="input-disc">
-        <div style="flex: 1.2;" class="pos-item-total">₹0.00</div>
+        <input type="number" style="flex: 0.8; text-align: center; width: 100%; box-sizing: border-box;" value="1" min="1" step="any" class="input-qty">
+        <input type="number" style="flex: 1.2; width: 100%; box-sizing: border-box;" placeholder="0.00" min="0" step="any" class="input-rate">
+        <input type="number" style="flex: 0.9; width: 100%; box-sizing: border-box;" value="18" min="0" max="100" step="any" class="input-tax">
+        <input type="number" style="flex: 0.9; width: 100%; box-sizing: border-box;" value="0" min="0" max="100" step="any" class="input-disc">
+        <div style="flex: 1.2; text-align: right;" class="pos-item-total">₹0.00</div>
         <button type="button" style="flex: 0.4;" class="btn-remove-row">✕</button>
     `;
     
